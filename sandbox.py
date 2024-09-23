@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from flask import Flask, Response, render_template, request
 from slackeventsapi import SlackEventAdapter
 from weather import get_current_weather
+import sqlite3
 
 
 load_dotenv()
@@ -58,20 +59,73 @@ def get_weather():
         feels_like=f"{weather_data['main']['feels_like']:.1f}"
     )
 
+# TODO: Implement customer table query as well as user
+# TODO: Provide arguements for targeting specific columns
+# TODO: Provide arguments for fuzzy search (case insensitive and/or like %search%)
 @app.route('/omni', methods=['POST'])
 def get_omni():
-	search = request.form.get('text')
+    search = request.form.get('text')
 
-	# Check for empty strings or string with only spaces
-	if not bool(search.strip()):
-		search = "Test"
+    # Check for empty strings or string with only spaces
+    if not bool(search.strip()):
+        search = "Test"
 
-	#do omni search
-	print('Searching for: ', search)
+    connection = sqlite3.connect("playground.db")
+    cursor = connection.cursor()
+    
+    userWhere = ""
+    # --- for users
+    
+    if search.count('@') == 1:
+        #if search contains an @ treat it like an email address
+        userWhere = f"email = '{search}'"
+    elif search.isnumeric():
+        #if search is a number, search phone or id and zip
+        if len(search) == 10:
+            userWhere = f"phone = '{search}'"
+        else:
+            userWhere = f"id = '{search}' or zip = '{search}'"
+    elif search.count(' ') == 1:
+        #if search contains only one space, treat it like a full name
+        names = search.split() 
+        userWhere = f"first_name = '{names[0]}' and last_name = '{names[1]}' or street_address = '{search}' or city = '{search}' or state = '{search}'"
+    else:
+        userWhere = f"first_name = '{search}' or last_name = '{search}' or street_address = '{search}' or city = '{search}' or state = '{search}'"
+
+    # --- for company
+    #if search contains a number, search id
+    
+    #if search contains a string, search name
+    
+    #if search contains @ search email
+    
+    print('where: ' + userWhere)
 
 
+    results  = cursor.execute(f"select * from users where {userWhere}").fetchall()
+    
+    if len(results) > 0:
+        message = ''
+        maxListSize = 5 # setting small max to avoid spamming slack with walls of text
+        N = len(results)
+        if N > maxListSize:
+            N = maxListSize
+            message = f"Found {len(results)} results, showing {maxListSize}:```"
+        else:
+            message = f"Found {len(results)} results:```"
+            
+        for row in results[:N]:
+            message += str(row) + '\n'
+            
+        message +="```"
+    else:
+        message = "No results found"
+        
+    client.chat_postMessage(channel='#slack-bot', text=message )
 
-	return Response(), 200
+    # cursor = connection.cursor()
+    connection.close()
+    return Response(), 200
 
 
 
