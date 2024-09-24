@@ -11,34 +11,34 @@ import sqlite3
 load_dotenv()
 
 app = Flask(__name__)
-# slack_event_adapter = SlackEventAdapter(signing_secret=os.getenv('SIGNING_SECRET'), endpoint = '/slack/events/', server= app)
+# slack_event_adapter = SlackEventAdapter(signing_secret=os.getenv("SIGNING_SECRET"), endpoint = "/slack/events/", server= app)
 
-# env_path = Path('.') / '.env'
+# env_path = Path(".") / ".env"
 # load_dotenv(dotenv_path = env_path)
 
-# client = slack.WebClient(token=os.environ['SLACK_TOKEN'])
+# client = slack.WebClient(token=os.environ["SLACK_TOKEN"])
 
-client = slack.WebClient(token=os.getenv('SLACK_TOKEN'))
+client = slack.WebClient(token=os.getenv("SLACK_TOKEN"))
 
-BOT_ID = client.api_call("auth.test")['user_id']
+BOT_ID = client.api_call("auth.test")["user_id"]
 
 
-# @slack_event_adapter.on('message')
+# @slack_event_adapter.on("message")
 # def message(payload):
-# 	event = payload.get('event', {})
-# 	print('event: ', event)
-# 	channel_id = event.get('channel')
-# 	user_id = event.get('user')
-# 	text = event.get('text')
+# 	event = payload.get("event", {})
+# 	print("event: ", event)
+# 	channel_id = event.get("channel")
+# 	user_id = event.get("user")
+# 	text = event.get("text")
 
 # 	if BOT_ID != user_id:
-# 		client.chat_postMessage(channel='#slack-bot', text=text )
+# 		client.chat_postMessage(channel="#slack-bot", text=text )
 
 # 	return Response(), 200
 
-@app.route('/weather')
+@app.route("/weather", methods=["POST"])
 def get_weather():
-    city = request.args.get('city')
+    city = request.form.get("text")
 
     # Check for empty strings or string with only spaces
     if not bool(city.strip()):
@@ -48,80 +48,134 @@ def get_weather():
     weather_data = get_current_weather(city)
 
     # City is not found by API
-    if not weather_data['cod'] == 200:
-        return render_template('city-not-found.html')
+    if not weather_data["cod"] == 200:
+        return render_template("city-not-found.html")
 
-    return render_template(
+    template = render_template(
         "weather.html",
         title=weather_data["name"],
         status=weather_data["weather"][0]["description"].capitalize(),
         temp=f"{weather_data['main']['temp']:.1f}",
         feels_like=f"{weather_data['main']['feels_like']:.1f}"
     )
+    
+    message = f""
+    
+    client.chat_postMessage(channel="#slack-bot", text=template )
+    return Response(), 200
+
+    
 
 # TODO: Implement customer table query as well as user
 # TODO: Provide arguements for targeting specific columns
 # TODO: Provide arguments for fuzzy search (case insensitive and/or like %search%)
-@app.route('/omni', methods=['POST'])
+@app.route("/omni", methods=["POST"])
 def get_omni():
-    search = request.form.get('text')
+    args = request.form.get("text")
+    userId = request.form.get("user_id")
+    
+    respondPublically = False
+    caseInsensitive = False
+    fuzzySearch = False
 
-    # Check for empty strings or string with only spaces
-    if not bool(search.strip()):
-        search = "Test"
+    if not bool(args.strip()):
+        client.chat_postEphemeral(channel="#slack-bot", user=userId, text="Please provide a valid query")
+        return Response(), 200 
+    
+    commands = ""
+    equality = "="
+    
+    if "--" in args:
+        args = args.split("--") 
+        search = args[0].strip()
+        commands = args[1]
+    else: 
+        search = args.strip()
+        
+    if commands:
+        fuzzySearch =       ("f" in commands or "F" in commands)
+        respondPublically = ("p" in commands or "P" in commands)
+        caseInsensitive =   ("s" in commands or "S" in commands)
+        
+    if caseInsensitive or fuzzySearch:
+        equality = "LIKE"
 
     connection = sqlite3.connect("playground.db")
     cursor = connection.cursor()
     
-    userWhere = ""
-    # --- for users
+    firstName = search
+    lastName = search
+    if fuzzySearch:
+        search = f"%{search}%"
+        firstName = search
+        lastName = search
     
-    if search.count('@') == 1:
-        #if search contains an @ treat it like an email address
-        userWhere = f"email = '{search}'"
+    if "@" in search:
+        userWhere = f"email {equality} :search"
     elif search.isnumeric():
-        #if search is a number, search phone or id and zip
         if len(search) == 10:
-            userWhere = f"phone = '{search}'"
+            userWhere = f"phone {equality} :search"
         else:
-            userWhere = f"id = '{search}' or zip = '{search}'"
-    elif search.count(' ') == 1:
-        #if search contains only one space, treat it like a full name
-        names = search.split() 
-        userWhere = f"first_name = '{names[0]}' and last_name = '{names[1]}' or street_address = '{search}' or city = '{search}' or state = '{search}'"
+            userWhere = f"id {equality} :search or zip {equality} :search"
+    else:     
+        userWhere = f"first_name {equality} :firstName or last_name {equality} :lastName or email {equality} :search or street_address {equality} :search or city {equality} :search or state {equality} :search"
+        if search.count(" ") == 1:
+            userWhere = userWhere.replace("or", "and", 1) #require first and last name to match
+            names = search.split() 
+            firstName = names[0]
+            lastName = names[1]
+            if fuzzySearch:
+                firstName = f"%{firstName}%"
+                lastName = f"%{lastName}%"
+
+
+    companyWhere = ""
+    if search.isnumeric(): 
+        companyWhere = f"id {equality} :search"
+    elif "@" in search:
+        companyWhere = f"email {equality} :search"
     else:
-        userWhere = f"first_name = '{search}' or last_name = '{search}' or street_address = '{search}' or city = '{search}' or state = '{search}'"
+        companyWhere = f"name {equality} :search"
+    
+    userResults  = cursor.execute(f"select * from users where {userWhere}", {"search": search, "firstName": firstName, "lastName": lastName}).fetchall()
+    companyResults = cursor.execute(f"select * from company where {companyWhere}", {"search": search}).fetchall()
+    maxListSize = 5 # setting small max to avoid spamming slack with walls of text
 
-    # --- for company
-    #if search contains a number, search id
+    userCount = len(userResults)
+    companyCount = len(companyResults)
     
-    #if search contains a string, search name
-    
-    #if search contains @ search email
-    
-    print('where: ' + userWhere)
-
-
-    results  = cursor.execute(f"select * from users where {userWhere}").fetchall()
-    
-    if len(results) > 0:
-        message = ''
-        maxListSize = 5 # setting small max to avoid spamming slack with walls of text
-        N = len(results)
-        if N > maxListSize:
-            N = maxListSize
-            message = f"Found {len(results)} results, showing {maxListSize}:```"
-        else:
-            message = f"Found {len(results)} results:```"
-            
-        for row in results[:N]:
-            message += str(row) + '\n'
-            
-        message +="```"
+    if userCount or companyCount:
+        message = f"Searching for \"{search}\":\n"
+        if userCount > 0:
+            message += f"found {userCount} user"
+            if (userCount > 1):
+                message += "s"
+            if userCount > maxListSize:
+                message += f", showing {maxListSize}"
+                
+            message += "\n```"
+            for row in userResults[:maxListSize]:
+                message += str(row) + "\n"
+            message += "```\n"
+                
+        if companyCount > 0:
+            message += f"found {companyCount} company"
+            if companyCount > 1:
+                message = message.replace("company", "companies")
+            if companyCount > maxListSize:
+                message += f", showing {maxListSize}"
+                
+            message += "\n```"
+            for row in companyResults[:maxListSize]:
+                message += str(row) + "\n"
+            message += "```"
     else:
-        message = "No results found"
+        message = "No results found."
         
-    client.chat_postMessage(channel='#slack-bot', text=message )
+    if respondPublically:
+        client.chat_postMessage(channel="#slack-bot", text=message )
+    else:
+        client.chat_postEphemeral(channel="#slack-bot", user=userId, text=message)
 
     # cursor = connection.cursor()
     connection.close()
