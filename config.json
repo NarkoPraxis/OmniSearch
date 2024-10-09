@@ -1,0 +1,27 @@
+{
+  "name": "playground.db",
+  "tables": [
+    {
+      "name": "users",
+      "fields": [
+        { "name": "id", "type": "number" },
+        { "name": "first_name", "type": "firstName" },
+        { "name": "last_name", "type": "lastName" },
+        { "name": "email", "type": "email" },
+        { "name": "phone", "type": "number" },
+        { "name": "street" },
+        { "name": "city" },
+        { "name": "state" },
+        { "name": "zip", "type": "number" }
+      ]
+    },
+    {
+      "name": "company",
+      "fields": [
+        { "name": "id", "type": "number" },
+        { "name": "name" },
+        { "name": "email", "type": "email" }
+      ]
+    }
+  ]
+}
