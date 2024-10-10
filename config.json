@@ -1,5 +1,6 @@
 {
   "name": "playground.db",
+  "resultMax": 5,
   "tables": [
     {
       "name": "users",
@@ -9,7 +10,7 @@
         { "name": "last_name", "type": "lastName" },
         { "name": "email", "type": "email" },
         { "name": "phone", "type": "number" },
-        { "name": "street" },
+        { "name": "street_address" },
         { "name": "city" },
         { "name": "state" },
         { "name": "zip", "type": "number" }

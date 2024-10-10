@@ -3,6 +3,7 @@ from types import SimpleNamespace
 
 class Database:
 	name = ""
+	resultMax = 0
 	tables = []
 	
 	def __init__(self, name):
@@ -11,5 +12,6 @@ class Database:
   
 		self.name = database.name
 		self.tables = database.tables
+		self.resultMax = database.resultMax
   
   

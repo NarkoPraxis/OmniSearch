@@ -32,10 +32,26 @@ Token Auth, Interactive Shell, Management Commands.
 12. paste the Bot User OAuth Token as the value for the .env file's SLACK_TOKEN
 13. navigate to [Basic Information](https://api.slack.com/apps/A07N8SJHNDA/general?) and copy your Signing Secret
 14. paste it in as the value for the .env file's SIGNING_SECRET 
-15. run `python sandbox.py` to run the server in debug mode
+
+## Running the application
+
+run `python sandbox.py` to run the server in debug mode. 
+	- this utilizes the test database included in the repo.
+run `python config_sandbox.py` to run the server in debug mode. 
+	- this reads the included config.json file to read a sqlite database. Fill out the config correctly and the app should work with whatever schema you have. 
 
 If everything was done correctly, /omni search should be available as a command in your slack workspace. 
 It can take some time for slack to update the workspace with the installed app, so be a bit patient. 
+
+## Config file
+`name`: The name of the .db file with which to connect.
+`resultMax`: the maximum number of results to return in the slack message
+`tables`: the tables that should be searched
+	`name`: the name of the table
+	`fields`: the column names inside the table that should be searched
+		`field`: the column names
+		`type`: the type of the column
+			-not currently used, may see support later
 
 ## Usage
 
@@ -47,3 +63,11 @@ If desired, arguements can be passed in after the search parameter with the `--`
 `--s` will perform the search as case insenstive by using `LIKE` instead of `=` for comparison
 
 these arguements can be mixed and matched, so `--fps`, `--psf`, and `--pf` will also work. 
+
+## TODO
+1. move queries to background threads to accomodate large databases / queries
+2. support multiple database connection methods, not just reading .db files
+3. provide more usage options for when the user knows they have an email, full name, or address etc
+	-should allow more optimized fuzzy searchs
+4. provide more options in config file for default behaviors.
+	-right now "maxResults" is the only option, which controlls how many results are returned inside slack. 
