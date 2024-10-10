@@ -22,11 +22,11 @@ Token Auth, Interactive Shell, Management Commands.
 6. navigate to [Slash Commands](https://api.slack.com/apps/A07N8SJHNDA/slash-commands)
 7. make a new slash command (I set the command as /omni with "search" as the usage hint)
 8. start ngrok and use `ngrok http 5000` to start forwarding `https://localhost:5000` to a public endpoint
-	- copy the port the forwarding address. It should look similiar to: `https://00b2-192-184-3-35.ngrok-free.app`. 
+	- copy the port forwarding address. It should look similiar to: `https://00b2-192-184-3-35.ngrok-free.app`. 
 	- paste the copied ngrok forwarding route into the url for your slash command
 		- add `/omni` to the end of the ngrok route. This will send arguements from the command to the correct route on the server
 	- save the slash command
-9. duplicate the `.env.example` file and remove the `.example` to create an .env file
+9. duplicate the `.env.example` file and remove the `.example` to create a .env file
 10. navigate to [Install App](https://api.slack.com/apps/A07N8SJHNDA/install-on-team?) and copy your Bot user OAuth Token
 11. while on the [Install App](https://api.slack.com/apps/A07N8SJHNDA/install-on-team?) page, click the `Install to <SlackWorkspaceName>` button. (You might have to do this again later if steps are done out of order)
 12. paste the Bot User OAuth Token as the value for the .env file's SLACK_TOKEN
@@ -50,9 +50,9 @@ It can take some time for slack to update the workspace with the installed app, 
 + `tables`: the tables that should be searched<br/>
    + `name`: the name of the table<br/>
    + `fields`: the column names inside the table that should be searched<br/>
-   + `field`: the column names<br/>
-      + `type`: the type of the column<br/>
-         + not currently used, may see support later<br/>
+   	+ `field`: the column names<br/>
+		+ `type`: the type of the column<br/>
+			+ not currently used, may see support later<br/>
 
 ## Usage
 
@@ -69,6 +69,6 @@ these arguements can be mixed and matched, so `--fps`, `--psf`, and `--pf` will 
 1. move queries to background threads to accomodate large databases / queries
 2. support multiple database connection methods, not just reading .db files
 3. provide more usage options for when the user knows they have an email, full name, or address etc
-	-should allow more optimized fuzzy searchs
+	- should allow for more optimized fuzzy searchs
 4. provide more options in config file for default behaviors.
-	-right now "maxResults" is the only option, which controlls how many results are returned inside slack. 
+	- right now "maxResults" is the only option, which controls how many results are returned inside slack. 
