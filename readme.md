@@ -35,32 +35,33 @@ Token Auth, Interactive Shell, Management Commands.
 
 ## Running the application
 
-run `python sandbox.py` to run the server in debug mode. <br/>
-   - this utilizes the test database included in the repo.<br/>
 run `python config_sandbox.py` to run the server in debug mode. <br/>
    - this reads the included config.json file to read a sqlite database. Fill out the config correctly and the app should work with whatever schema you have. <br/>
+
+or run `python sandbox.py` to run the server in debug mode. <br/>
+   - this utilizes the test database included in the repo.<br/>
 
 If everything was done correctly, /omni search should be available as a command in your slack workspace.<br/>
 It can take some time for slack to update the workspace with the installed app, so be a bit patient.<br/>
 
 ## Config file
-`name`: The name of the .db file with which to connect.<br/>
-`resultMax`: the maximum number of results to return in the slack message<br/>
-`tables`: the tables that should be searched<br/>
-   `name`: the name of the table<br/>
-   `fields`: the column names inside the table that should be searched<br/>
-      `field`: the column names<br/>
-      `type`: the type of the column<br/>
-         -not currently used, may see support later<br/>
++ `name`: The name of the .db file with which to connect.<br/>
++ `resultMax`: the maximum number of results to return in the slack message<br/>
++ `tables`: the tables that should be searched<br/>
+   + `name`: the name of the table<br/>
+   + `fields`: the column names inside the table that should be searched<br/>
+   + `field`: the column names<br/>
+      + `type`: the type of the column<br/>
+         + not currently used, may see support later<br/>
 
 ## Usage
 
 By default, /omni accepts any number of words or numbers as input and will use that input as a single, case-sensitive, query on an example database.
 
 If desired, arguements can be passed in after the search parameter with the `--` sign.<br/>
-`--f` will perform a fuzzy search by appending `%` to the front and back of a search term and using `LIKE` instead of `=` for comparison<br/>
-`--p` will post the result into slack publically instead of keeping the result private<br/>
-`--s` will perform the search as case insenstive by using `LIKE` instead of `=` for comparison<br/>
++ `--f` will perform a fuzzy search by appending `%` to the front and back of a search term and using `LIKE` instead of `=` for comparison<br/>
++ `--p` will post the result into slack publically instead of keeping the result private<br/>
++ `--s` will perform the search as case insenstive by using `LIKE` instead of `=` for comparison<br/>
 
 these arguements can be mixed and matched, so `--fps`, `--psf`, and `--pf` will also work. 
 
