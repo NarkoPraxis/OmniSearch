@@ -57,7 +57,7 @@ It can take some time for slack to update the workspace with the installed app, 
 		+ `type`: the type of the column<br/>
 			+ not currently used, may see support later<br/>
 
-# MySql Configuration
+#### MySql Configuration
 The database `name` is still set in the configuration file.<br/>
 the other connection information is filled out in the environment file</br>
 `MYSQL_HOST=`</br>
