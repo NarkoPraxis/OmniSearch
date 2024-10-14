@@ -1,0 +1,39 @@
+{
+  "name": "homestead",
+  "type": "mysql",
+  "channel": "#slack-bot",
+  "resultMax": 5,
+  "tables": [
+    {
+      "name": "users",
+      "fields": [
+        { "name": "id", "type": "number" },
+        { "name": "name" },
+        { "name": "email", "type": "email" }
+      ]
+    },
+    {
+      "name": "customers",
+      "fields": [
+        { "name": "id", "type": "number" },
+        { "name": "name" },
+        { "name": "email", "type": "email" },
+        { "name": "phone", "type": "phone" },
+        { "name": "license" },
+        { "name": "address" },
+        { "name": "city" },
+        { "name": "state" },
+        { "name": "zip" }
+      ]
+    },
+    {
+      "name": "clients",
+      "fields": [
+        { "name": "id", "type": "number" },
+        { "name": "name"},
+        { "name": "category" },
+        { "name": "source" }
+      ]
+    }
+  ]
+}

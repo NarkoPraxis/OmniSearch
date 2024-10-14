@@ -3,9 +3,10 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 from flask import Flask, Response, request
-import sqlite3
-from database import Database 
+
+from config_reader import Config_Reader
 from result import Result
+import sys
 
 load_dotenv()
 
@@ -49,55 +50,24 @@ def get_omni():
 	if caseInsensitive or fuzzySearch:
 		equality = "LIKE"
 		
-	database = Database("config.json")
-
-	connection = sqlite3.connect(database.name)
-	cursor = connection.cursor()
-	
-	firstName = search
-	lastName = search
-	
 	if fuzzySearch:
 		search = f"%{search}%"
-		firstName = search
-		lastName = search
-
-	results = []
-	for table in database.tables:
-		where = []
- 
-		for field in table.fields:
-			where.append(f"{field.name} {equality} :search")
-			
-		results.append(Result(
-			cursor.execute(f"select * from {table.name} where " + " or ".join(where), {"search": search}).fetchall(),
-			table.name
-		))
-
-	foundResult = False
-	message = f"Searching for \"{search}\":\n"
-	for result in results:
-		count = len(result.data)
-		if count:
-			foundResult = True
-			message += f"found {count} on the {result.tableName} table"
-			if count > database.resultMax:
-				message += f", showing {database.resultMax}"
-					
-			message += "\n```"
-			for row in result.data[:database.resultMax]:
-					message += str(row) + "\n"
-			message += "```\n"
-
-	if not foundResult:
-		message = "No results found."
-		
-	if respondPublically:
-		client.chat_postMessage(channel="#slack-bot", text=message )
+  
+	if __name__ == "__main__" and len(sys.argv) > 1:
+		configPath = sys.argv[1]
 	else:
-		client.chat_postEphemeral(channel="#slack-bot", user=userId, text=message)
+		configPath = "config.json"
+  
+	database = Config_Reader(configPath).databaseFactory()
+	message = database.omniSearch(search, equality)
+ 
+	print(message)
 
-	connection.close()
+	if respondPublically:
+		client.chat_postMessage(channel=database.channel, text=message )
+	else:
+		client.chat_postEphemeral(channel=database.channel, user=userId, text=message)
+
 	return Response(), 200
 
 

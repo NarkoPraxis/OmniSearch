@@ -36,7 +36,8 @@ Token Auth, Interactive Shell, Management Commands.
 ## Running the application
 
 run `python config_sandbox.py` to run the server in debug mode. <br/>
-   - this reads the included config.json file to read a sqlite database. Fill out the config correctly and the app should work with whatever schema you have. <br/>
+   - this reads the included config.json file to connect to a sqlite or mysql database. Fill out the config correctly and the app should work with whatever schema you have. <br/>
+	- add a file path as the first arguement to the config and you can now provide a config file that isn't named `config.json`
 
 or run `python sandbox.py` to run the server in debug mode. <br/>
    - this utilizes the test database included in the repo.<br/>
@@ -45,7 +46,9 @@ If everything was done correctly, /omni search should be available as a command 
 It can take some time for slack to update the workspace with the installed app, so be a bit patient.<br/>
 
 ## Config file
-+ `name`: The name of the .db file with which to connect.<br/>
++ `name`: The name of the sqlite .db file (or mysql database) with which to connect.<br/>
++ `type`: `mysql` or `sqlite` determines which kind of database connection should be attempted<br/>
++ `channel`: `#channel-name` of the channel where your bot should post replies and listen for commands
 + `resultMax`: the maximum number of results to return in the slack message<br/>
 + `tables`: the tables that should be searched<br/>
    + `name`: the name of the table<br/>
@@ -53,6 +56,13 @@ It can take some time for slack to update the workspace with the installed app, 
    	+ `field`: the column names<br/>
 		+ `type`: the type of the column<br/>
 			+ not currently used, may see support later<br/>
+
+# MySql Configuration
+The database `name` is still set in the configuration file.<br/>
+the other connection information is filled out in the environment file</br>
+`MYSQL_HOST=`</br>
+`MYSQL_USER=`</br>
+`MYSQL_PASSWORD=`</br>
 
 ## Usage
 
@@ -67,8 +77,10 @@ these arguements can be mixed and matched, so `--fps`, `--psf`, and `--pf` will 
 
 ## TODO
 1. move queries to background threads to accomodate large databases / queries
-2. support multiple database connection methods, not just reading .db files
+~~2. support multiple database connection methods, not just reading .db files~~
 3. provide more usage options for when the user knows they have an email, full name, or address etc
 	- should allow for more optimized fuzzy searchs
 4. provide more options in config file for default behaviors.
 	- right now "maxResults" is the only option, which controls how many results are returned inside slack. 
+5. add postgress support
+6. add ability to connect and query multiple database connections asynchronously

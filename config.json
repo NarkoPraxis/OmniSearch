@@ -1,5 +1,7 @@
 {
   "name": "playground.db",
+  "type": "sqlite",
+  "channel": "#slack-bot",
   "resultMax": 5,
   "tables": [
     {
