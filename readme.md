@@ -71,16 +71,20 @@ By default, /omni accepts any number of words or numbers as input and will use t
 If desired, arguements can be passed in after the search parameter with the `--` sign.<br/>
 + `--f` will perform a fuzzy search by appending `%` to the front and back of a search term and using `LIKE` instead of `=` for comparison<br/>
 + `--p` will post the result into slack publically instead of keeping the result private<br/>
-+ `--s` will perform the search as case insenstive by using `LIKE` instead of `=` for comparison<br/>
++ `--s` will perform the search as case insensitive by using `LIKE` instead of `=` for comparison<br/>
 
 these arguements can be mixed and matched, so `--fps`, `--psf`, and `--pf` will also work. 
 
 ## TODO
 1. move queries to background threads to accomodate large databases / queries
-~~2. support multiple database connection methods, not just reading .db files~~
-3. provide more usage options for when the user knows they have an email, full name, or address etc
+2. provide more usage options for when the user knows they have an email, full name, or address etc
 	- should allow for more optimized fuzzy searchs
-4. provide more options in config file for default behaviors.
+3. provide more options in config file for default behaviors.
 	- right now "maxResults" is the only option, which controls how many results are returned inside slack. 
-5. add postgress support
-6. add ability to connect and query multiple database connections asynchronously
+4. add postgress support
+5. add ability to connect and query multiple database connections asynchronously
+
+#### Finished goals
++ mvp: slack app works, hardcoded queries return results
++ config file support -> any sqlite database can be used
++ support multiple database connection methods, not just reading .db files (added mysql support)
