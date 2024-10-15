@@ -12,9 +12,9 @@
         { "name": "last_name", "type": "lastName" },
         { "name": "email", "type": "email" },
         { "name": "phone", "type": "number" },
-        { "name": "street_address" },
-        { "name": "city" },
-        { "name": "state" },
+        { "name": "street_address", "type": "address" },
+        { "name": "city", "type": "address" },
+        { "name": "state", "type": "address"},
         { "name": "zip", "type": "number" }
       ]
     },
