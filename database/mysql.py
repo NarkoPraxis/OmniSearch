@@ -1,5 +1,6 @@
 import mysql.connector
 import os
+from args import Arguements
 from config_reader import Config_Reader 
 from result import Result
 
@@ -28,18 +29,22 @@ class MySqlDatabase(Config_Reader):
 	def closeConnection(self):
 		self.connection.close()
   
-	def doQuery(self, search, equality):
-		self.search = search
+	def doQuery(self, arguements: Arguements):
+		self.search = arguements.search
 		cursor = self.connection.cursor()
   
 		for table in self.tables:
 			where = []
+			count = 0
 	
 			for field in table.fields:
-				where.append(f"{field.name} {equality} %s")
+				if self.shouldInclude(arguements, field):
+					count += 1
+					where.append(f"{field.name} {arguements.equality} %s")
 
-			cursor.execute(f"select * from {table.name} where " + " or ".join(where), [search] * len(table.fields))
-			self.results.append(Result(cursor.fetchall(), table.name))
+			if len(where):
+				cursor.execute(f"select * from {table.name} where " + " or ".join(where), [arguements.search] * count)
+				self.results.append(Result(cursor.fetchall(), table.name))
   
 	def omniSearch(self, search, equality):
 		self.openConnection()

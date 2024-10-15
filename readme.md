@@ -72,6 +72,9 @@ If desired, arguements can be passed in after the search parameter with the `--`
 + `--f` will perform a fuzzy search by appending `%` to the front and back of a search term and using `LIKE` instead of `=` for comparison<br/>
 + `--p` will post the result into slack publically instead of keeping the result private<br/>
 + `--s` will perform the search as case insensitive by using `LIKE` instead of `=` for comparison<br/>
++ `--e` will only search fields of type: `email`<br>
++ `--a` will only search fields of type: `address`<br>
++ `--n` will only search fields of type: `name`<br>
 
 these arguements can be mixed and matched, so `--fps`, `--psf`, and `--pf` will also work. 
 

@@ -1,6 +1,8 @@
 import json
 from types import SimpleNamespace
 
+from args import Arguements
+
 
 class Config_Reader:
 	name = ""
@@ -39,6 +41,31 @@ class Config_Reader:
 			message = "No results found."
 		
 		return message
+
+	def shouldInclude(self, arguements: Arguements, field):
+		# if no arguements, return true
+		include = True
+		field = vars(field)
+  
+		# if arguements, return false unless type matches
+		if arguements.email or arguements.name or arguements.address or arguements.number:
+			include = False
+   
+		# if no type, return based on presence of arguments
+		if "type" not in field:
+			return include
+
+		# include if arguement matches type
+		if arguements.email and field["type"] == 'email':
+			return True
+		if arguements.name and field["type"] == 'name':
+			return True
+		if arguements.address and field["type"] == 'address':
+			return True
+		if arguements.number and field["type"] == 'number':
+			return True
+
+		return include
   
 	def databaseFactory(self):
 		if self.type == "sqlite":
