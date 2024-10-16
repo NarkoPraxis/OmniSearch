@@ -80,15 +80,18 @@ If desired, arguements can be passed in after the search parameter with the `--`
 these arguements can be mixed and matched, so `--fps`, `--psf`, and `--pf` will also work. 
 
 ## TODO
-1. move queries to background threads to accomodate large databases / queries
-2. provide more usage options for when the user knows they have an email, full name, or address etc
-	- should allow for more optimized fuzzy searchs
-3. provide more options in config file for default behaviors.
-	- right now "maxResults" is the only option, which controls how many results are returned inside slack. 
-4. add postgress support
-5. add ability to connect and query multiple database connections asynchronously
+1. provide more options in config file for default behaviors. So far I have:
+	- maxResults
+	- databaseType
+	- slack channel-name
+2. add postgress support
+3. add ability to connect and query multiple database connections asynchronously
+4. validate security of stored variables
+5. make it an offical slack app
 
 #### Finished goals
 + mvp: slack app works, hardcoded queries return results
 + config file support -> any sqlite database can be used
 + support multiple database connection methods, not just reading .db files (added mysql support)
++ provide more usage options for when the user knows they have an email, full name, or address etc
++ move queries to background threads to accomodate large databases / queries

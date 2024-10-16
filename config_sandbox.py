@@ -4,6 +4,7 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 from flask import Flask, Response, request
+from threading import Thread
 
 from config_reader import Config_Reader
 from result import Result
@@ -33,15 +34,14 @@ def get_omni():
 		configPath = sys.argv[1]
 	else:
 		configPath = "config.json"
-  
-	arguements = Arguements(args)
-	database = Config_Reader(configPath).databaseFactory()
-	message = database.omniSearch(arguements)
 
-	if arguements.respondPublically:
-		client.chat_postMessage(channel=database.channel, text=message )
-	else:
-		client.chat_postEphemeral(channel=database.channel, user=userId, text=message)
+	arguements = Arguements(args)
+	database = Config_Reader(configPath, userId).databaseFactory()
+ 
+	thread = Thread(database.omniSearch(arguements))
+ 
+	thread.daemon = True
+	thread.start()
 
 	return Response(), 200
 

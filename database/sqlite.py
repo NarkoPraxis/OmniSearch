@@ -1,20 +1,11 @@
 from args import Arguements
 from config_reader import Config_Reader 
+from database.base import Database
 from result import Result
 import sqlite3
 
-class SqliteDatabase(Config_Reader):
-	connection = {}
-	results = []
-	search = ""
+class SqliteDatabase(Database):
  
-	def __init__(self, database: Config_Reader):  
-		self.name = database.name
-		self.type = database.type
-		self.tables = database.tables
-		self.resultMax = database.resultMax
-		self.channel = database.channel
-
 	def openConnection(self):
 		self.connection = sqlite3.connect(self.name)
   
@@ -38,10 +29,6 @@ class SqliteDatabase(Config_Reader):
 					cursor.execute(f"select * from {table.name} where " + " or ".join(where), (arguements.search,)).fetchall(),
 					table.name
 				))
-  
-	def omniSearch(self, arguements: Arguements):
-		self.openConnection()
-		self.doQuery(arguements)
-		message = self.getMessage(self.results)
-		self.closeConnection()
-		return message
+    
+		cursor.close()
+

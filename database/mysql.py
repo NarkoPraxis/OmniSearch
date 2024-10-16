@@ -1,22 +1,12 @@
 import mysql.connector
 import os
 from args import Arguements
-from config_reader import Config_Reader 
+
+from database.base import Database
 from result import Result
 
 
-class MySqlDatabase(Config_Reader):
-	connection = {}
-	results = []
-	search = ""
- 
-	def __init__(self, config):  
-		self.name = config.name
-		self.type = config.type
-		self.tables = config.tables
-		self.resultMax = config.resultMax
-		self.channel = config.channel
-
+class MySqlDatabase(Database):
  
 	def openConnection(self):
 		self.connection = mysql.connector.connect(
@@ -45,10 +35,6 @@ class MySqlDatabase(Config_Reader):
 			if len(where):
 				cursor.execute(f"select * from {table.name} where " + " or ".join(where), [arguements.search] * count)
 				self.results.append(Result(cursor.fetchall(), table.name))
+    
+		cursor.close()
   
-	def omniSearch(self, search, equality):
-		self.openConnection()
-		self.doQuery(search, equality)
-		message = self.getMessage(self.results)
-		self.closeConnection()
-		return message
