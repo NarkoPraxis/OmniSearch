@@ -1,8 +1,10 @@
 from args import Arguements
+from result import Result
+from config_reader import Config_Reader
+
 import slack
 import os
 
-from config_reader import Config_Reader
 
 #shared functionality between all databases
 class Database():
@@ -29,9 +31,28 @@ class Database():
   
 	def closeConnection(self):
 		pass # implemented by child class
-  
+
 	def doQuery(self, arguements: Arguements):
-		pass # implemented by child class
+		self.search = arguements.search
+		cursor = self.connection.cursor()
+  
+		for table in self.tables:
+			where = []
+			count = 0
+	
+			for field in table.fields:
+				if self.shouldInclude(arguements, field):
+					count += 1
+					if hasattr(field, 'type') and field.type == "number":
+						where.append(f"CAST({field.name} AS TEXT) {arguements.equality} %s")
+					else:
+						where.append(f"{field.name} {arguements.equality} %s")
+
+			if len(where):
+				cursor.execute(f"select * from {table.name} where " + " or ".join(where), [arguements.search] * count)
+				self.results.append(Result(cursor.fetchall(), table.name))
+    
+		cursor.close()
   
 	def getMessage(self, results):
 		foundResult = False

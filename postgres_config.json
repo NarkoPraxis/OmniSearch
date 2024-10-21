@@ -1,0 +1,28 @@
+{
+  "name": "omnisearch",
+  "type": "postgresql",
+  "channel": "#slack-bot",
+  "resultMax": 5,
+  "tables": [
+    {
+      "name": "users",
+      "fields": [
+        { "name": "first_name", "type": "firstName" },
+        { "name": "last_name", "type": "lastName" },
+        { "name": "email", "type": "email" },
+        { "name": "phone", "type": "number" },
+        { "name": "street", "type": "address" },
+        { "name": "city", "type": "address" },
+        { "name": "state", "type": "address"},
+        { "name": "zip", "type": "number" }
+      ]
+    },
+    {
+      "name": "companies",
+      "fields": [
+        { "name": "name" },
+        { "name": "email", "type": "email" }
+      ]
+    }
+  ]
+}

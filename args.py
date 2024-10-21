@@ -11,6 +11,8 @@ class Arguements():
 	number = False
  
 	def __init__(self, args):
+		commands = False
+  
 		if "--" in args:
 			args = args.split("--") 
 			self.search = args[0].strip()

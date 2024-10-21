@@ -64,6 +64,14 @@ the other connection information is filled out in the environment file</br>
 `MYSQL_USER=`</br>
 `MYSQL_PASSWORD=`</br>
 
+#### Postgres Configuration
+The database `name` is still set in the configuration file.<br/>
+the other connection information is filled out in the environment file</br>
+`POSTGRESQL_HOST=`</br>
+`POSTGRESQL_USER=`</br>
+`POSTGRESQL_PASSWORD=`</br>
+`POSTGRESQL_PORT=`</br>
+
 ## Usage
 
 By default, /omni accepts any number of words or numbers as input and will use that input as a single, case-sensitive, query on an example database.
@@ -84,10 +92,11 @@ these arguements can be mixed and matched, so `--fps`, `--psf`, and `--pf` will 
 	- maxResults
 	- databaseType
 	- slack channel-name
-2. add postgress support
-3. add ability to connect and query multiple database connections asynchronously
-4. validate security of stored variables
-5. make it an offical slack app
+2. validate security of stored variables
+3. make it an offical slack app
+
+#### Long Term Ideas:
++ add ability to connect and query multiple database connections asynchronously
 
 #### Finished goals
 + mvp: slack app works, hardcoded queries return results
@@ -95,3 +104,4 @@ these arguements can be mixed and matched, so `--fps`, `--psf`, and `--pf` will 
 + support multiple database connection methods, not just reading .db files (added mysql support)
 + provide more usage options for when the user knows they have an email, full name, or address etc
 + move queries to background threads to accomodate large databases / queries
++ add postgress support

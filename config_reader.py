@@ -29,4 +29,7 @@ class Config_Reader:
 		elif self.type == "mysql":
 			from database.mysql import MySqlDatabase
 			return MySqlDatabase(self)
+		elif self.type == "postgresql":
+			from database.postgresql import postgresSqlDatabase
+			return postgresSqlDatabase(self)
   

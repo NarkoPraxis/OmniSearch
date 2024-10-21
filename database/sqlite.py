@@ -22,7 +22,10 @@ class SqliteDatabase(Database):
 
 			for field in table.fields:
 				if self.shouldInclude(arguements, field):
-					where.append(f"{field.name} {arguements.equality} :search")
+					if hasattr(field, 'type') and field.type == "number":
+						where.append(f"CAST({field.name} AS TEXT) {arguements.equality} :search")
+					else:
+						where.append(f"{field.name} {arguements.equality} :search")
          
 			if len(where):
 				self.results.append(Result(
